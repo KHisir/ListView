@@ -1,0 +1,111 @@
+<!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"> -->
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.0/css/all.css"
+  integrity="sha384-OLYO0LymqQ+uHXELyx93kblK5YIS3B2ZfLGBmsJaUyor7CpMTBsahDHByqSuWW+q" crossorigin="anonymous">
+
+<link href="https://fonts.googleapis.com/css?family=Quicksand:400,700" rel="stylesheet">
+
+<div id="lw-wrapper" [ngClass]="getGridTemplateRowClass()">
+  <!-- header -->
+  <div id="header" [class.flex-end]="showSearch === false && currentListViewMode !== ListViewMode.Edit">
+    <div class="cc-checkbox" [hidden]="currentListViewMode !== ListViewMode.Edit">
+      <input (change)="checkAll($event)" class="inp-cbx" [attr.id]="'id-' + componentId" type="checkbox"
+        style="display: none;" /><label class="cbx" [attr.for]="'id-' + componentId"><span><svg width="12px" height="9px" viewbox="0 0 12 9">
+            <polyline points="1 5 4 8 11 1"></polyline>
+          </svg></span><span>All</span></label>
+    </div>
+    <div class="search-box" *ngIf="showSearch && currentListViewMode !== ListViewMode.Edit">
+      <input type="text" [(ngModel)]="searchString" (keyup.enter)="searchOnClick()" placeholder="Search">
+      <button type="button" (click)="searchString = ''" [class.round-right]="clientsideSearch === true"><i class="fas fa-times"></i></button>
+      <button type="button" (click)="searchOnClick()" [hidden]="clientsideSearch === true"><i class="fas fa-search"></i></button>
+    </div>
+    <div class="checked-count-info" *ngIf="currentListViewMode === ListViewMode.Edit">
+      <span *ngIf="checkedItems.length === 0">Please select</span>
+      <span *ngIf="checkedItems.length > 0">{{checkedItems.length}} selected.</span>
+    </div>
+    <div class="cc-dopdown" *ngIf="showMenu" #dropdown>
+      <button (click)="menuIsOpen = !menuIsOpen">
+        <i class="fa fa-ellipsis-v"></i>
+      </button>
+      <div class="cc-dropdown-menu" [class.show]="menuIsOpen === true">
+        <a (click)="menuIsOpen = false; currentListViewMode = ListViewMode.Edit" *ngIf="listViewActions.length > 0" title="Edit">Edit</a>
+        <a (click)="menuIsOpen = false; currentListViewMode = ListViewMode.SortBy; uncheckAll();" title="Sort by">Sort by</a>
+        <a (click)="menuIsOpen = false; currentListViewMode = ListViewMode.None; uncheckAll();" *ngIf="listViewActions.length > 0" [class.disabled]="currentListViewMode === ListViewMode.None" title="Cancel">Cancel</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- content -->
+  <div id="content">
+    <div class="list-item" *ngFor="let item of items" [class.checked-background]="item.IsSelected === true">
+      <div>
+        <div class="img-container" *ngIf="item.Icon !== ''">
+          <!-- You can add here an image or an svg icon: -->
+          <!-- <i class="fa fa-user" aria-hidden="true"></i> -->
+          <!-- <img [attr.src]="item.Icon" alt=""> -->
+        </div>
+        
+        <div class="cc-checkbox" [hidden]="currentListViewMode !== ListViewMode.Edit">
+          <input [(ngModel)]="item.IsSelected" (change)="refreshCheckedItems()" class="inp-cbx" [attr.id]="'id-' + componentId + item.Id" type="checkbox"
+            style="display: none;" /><label class="cbx" [attr.for]="'id-' + componentId + item.Id"><span><svg width="12px"
+                height="9px" viewbox="0 0 12 9">
+                <polyline points="1 5 4 8 11 1"></polyline>
+              </svg></span><span></span></label>
+        </div>
+        <div class="text-container">
+          <span class="item-text" [innerHtml]="item.Text | highlightSearch: searchString">
+          </span>
+          <span class="item-subtext" *ngIf="showListItemSubtext">
+            {{item.SubText}}
+          </span>
+        </div>
+
+        <div class="right-container">
+          <span class="item-header-info" *ngIf="showListItemInfo">{{item.Info}}</span>
+          <div>
+            <div class="cc-badge" *ngIf="showListItemBadge"><span>{{item.Badge}}</span></div>
+            <button (click)="itemEditOnClick(item)" *ngIf="listItemActions.length > 0">
+              <i class="fas fa-pencil-alt"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+      <div class="list-item-contextmenu slideup" [class.slidedown]="item.IsActive === true">
+        <button (click)="itemContextMenuActionOnClick(action, item)" *ngFor="let action of listItemActions">
+          {{action.Name}}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- footer -->
+  <div id="footer" *ngIf="showPaginator === true">
+    <app-cc-paginator [length]="data.length" [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions" [maxDisplayedTotalPages]="maxDisplayedTotalPages" [bordered]="paginatorBordered" (page)="pagerOnChange($event)"></app-cc-paginator>
+  </div>
+
+  <div id="checked-items-contextmenu" *ngIf="checkedItems.length > 0">
+    <button (click)="contextMenuActionOnClick(action)" *ngFor="let action of listViewActions">
+      {{action.Name}}
+    </button>
+  </div>
+
+  <div id="sortByContainer" [hidden]="currentListViewMode !== ListViewMode.SortBy">
+    <div *ngIf="currentListViewMode === ListViewMode.SortBy" [@panelInOut]>
+      <div id="header">
+        <h3>Sort by</h3>
+      </div>
+
+      <div id="content">
+        <label [attr.for]="'id-' + componentId + sb.Type" class="radio" *ngFor="let sb of sortBySelection">
+          <input type="radio" [attr.id]="'id-' + componentId + sb.Type"
+            (change)="sortBy = sb" [checked]="sortBy.Type === sb.Type" class="hidden" />
+          <span class="label"></span>{{sb.Name}}
+        </label>
+      </div>
+
+      <div id="footer">
+        <button class="cancel-btn" (click)="currentListViewMode = ListViewMode.None; sortItems()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

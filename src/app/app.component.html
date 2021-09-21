@@ -1,0 +1,20 @@
+<div class="any-outside-container">
+    <app-cc-listview 
+    [data]="data"
+    [listItemActions]="listItemActions"
+    [listViewActions]="listViewActions"
+    [showSearch]="true" 
+    [showMenu]="true"
+    [showPaginator]="true"
+    [showListItemBadge]="true"
+    [showListItemSubtext]="true"
+    [showListItemInfo]="true"
+    (searchTriggered)="onSearch($event)"
+    (sortTriggered)="onSort($event)"
+    (paginationTriggered)="onPaged($event)"
+    (listItemActionTriggered)="onItemAction($event)"
+    (listViewActionTriggered)="onListViewAction($event)"
+    >
+    </app-cc-listview>
+</div>
+<router-outlet></router-outlet>

@@ -1,0 +1,38 @@
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.0/css/all.css"
+  integrity="sha384-OLYO0LymqQ+uHXELyx93kblK5YIS3B2ZfLGBmsJaUyor7CpMTBsahDHByqSuWW+q" crossorigin="anonymous">
+
+<link href="https://fonts.googleapis.com/css?family=Quicksand:400,700" rel="stylesheet">
+
+<div id="p-wrapper" [class.bordered]="bordered === true" #wrapper>
+  <ul>
+    <li [class.disabled]="pager.CurrentPage === 1 || length === 0" (click)="setPage(1)" title="First">
+        <i class="fa fa-step-backward" aria-hidden="true"></i>
+    </li>
+    <li [class.disabled]="pager.CurrentPage === 1 || length === 0" (click)="setPage(pager.CurrentPage - 1)" title="Previous">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+    </li>
+    <li [class.active]="pager.CurrentPage === page" (click)="setPage(page)" class="pages" [class.hide]="disablePageBtns === true" *ngFor="let page of pager.Pages" title="{{page}}">
+        <span>{{page}}</span>
+    </li>
+    <li *ngIf="disablePageBtns === true">
+      <select (change)="pageOnSelect($event)" *ngIf="disablePageBtns === true">
+        <option *ngFor="let page of getTotalPagesArr(pager.TotalPages)" [selected]="page === pager.CurrentPage">{{page}}</option>
+      </select>
+    </li>
+    <li [class.disabled]="pager.CurrentPage === pager.TotalPages || length === 0" (click)="setPage(pager.CurrentPage + 1)" title="Next">
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+    </li>
+    <li [class.disabled]="pager.CurrentPage === pager.TotalPages || length === 0" (click)="setPage(pager.TotalPages)" title="Last">
+        <i class="fa fa-step-forward" aria-hidden="true"></i>
+    </li>
+  </ul>
+
+  <div class="page-size-container">
+    <span>{{pager.Info}}</span>
+
+    <select (change)="pageSizeOnChange($event)" [disabled]="length === 0">
+      <option *ngFor="let pageSize of pager.PageSizeList" [selected]="pageSize === pager.PageSize">{{pageSize}}</option>
+    </select>
+  </div>
+
+</div>

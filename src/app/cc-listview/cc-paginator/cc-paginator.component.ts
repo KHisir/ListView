@@ -1,7 +1,8 @@
-import { ElementRef, HostListener, Output, ViewChild } from '@angular/core';
+import { ElementRef, HostListener, OnDestroy, Output, ViewChild } from '@angular/core';
 import { EventEmitter } from '@angular/core';
 import { Input } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { Pager } from './pager';
 import { PaginatorService } from './service/paginator.service';
 
@@ -10,7 +11,7 @@ import { PaginatorService } from './service/paginator.service';
   templateUrl: './cc-paginator.component.html',
   styleUrls: ['./cc-paginator.component.scss']
 })
-export class CcPaginatorComponent implements OnInit {
+export class CcPaginatorComponent implements OnInit, OnDestroy {
   private _length: number = 0;
   
   @Output() page = new EventEmitter<Pager>();
@@ -36,6 +37,7 @@ export class CcPaginatorComponent implements OnInit {
   }
 
   @ViewChild("wrapper") paginatorWrapper?: ElementRef;
+  subscription!: Subscription;
 
   pager: Pager;
   disablePageBtns: boolean = false;
@@ -50,7 +52,20 @@ export class CcPaginatorComponent implements OnInit {
     this.pager = new Pager(this.pageSize, this.length, this.maxDisplayedTotalPages);
   }
 
-  ngOnInit() {}
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
+
+  ngOnInit() {
+    this.subscription = this.paginatorService.onReset().subscribe((res: any) => {
+      // success
+      this.setPage(1, false);
+    }, (err) => {
+      // error
+    }, () => {
+      // complete
+    });
+  }
 
   togglePages(): void {
     if (this.paginatorWrapper !== undefined) {

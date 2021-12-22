@@ -1,25 +1,29 @@
-export enum SortByKey {
-  None = 0,
-  IndexAsc = 1,
-  IndexDesc = 2,
-  TextAsc = 3,
-  TextDesc = 4,
-  SubTextAsc = 5,
-  SubTextDesc = 6,
-  InfoAsc = 7,
-  InfoDesc = 8,
-  BadgeAsc = 9,
-  BadgeDesc = 10
+export enum PropType {
+  String = 0,
+  Number = 1,
+  Boolean = 2,
+  Date = 3
 }
 
 export class SortBy {
-  public Type: SortByKey;
-  public Value: string;
+  public Prop: string;
+  public PropType: PropType;
   public Name: string;
-  constructor(type: SortByKey, value: string, name: string) {
-    this.Type = type;
-    this.Value = value;
+  public IsDefault: boolean;
+  public Reversed: boolean;
+
+  constructor(
+    prop: string,
+    name: string,
+    propType: PropType = PropType.String,
+    reversed: boolean = false,
+    isDefault: boolean = false,
+  ) {
+    this.Prop = prop;
     this.Name = name;
+    this.PropType = propType;
+    this.Reversed = reversed;
+    this.IsDefault = isDefault;
   }
 }
 
@@ -45,50 +49,50 @@ export class Sorter {
     if (isBooleanSort) {
       if (sortBy !== '' && sortBy !== null) {
         // tslint:disable-next-line:only-arrow-functions
-        list.sort(function(a: any, b: any) {
+        list.sort(function (a: any, b: any) {
           return reversed * (Number(a[sortBy]) - Number(b[sortBy]));
         });
       } else {
         // tslint:disable-next-line:only-arrow-functions
-        list.sort(function(a: any, b: any) {
+        list.sort(function (a: any, b: any) {
           return reversed * (Number(a) - Number(b));
         });
       }
     } else if (isNumericSort) {
       if (sortBy !== '' && sortBy !== null) {
         // tslint:disable-next-line:only-arrow-functions
-        list.sort(function(a: any, b: any) {
+        list.sort(function (a: any, b: any) {
           return reversed * (a[sortBy] - b[sortBy]);
         });
       } else {
         // tslint:disable-next-line:only-arrow-functions
-        list.sort(function(a: any, b: any) {
+        list.sort(function (a: any, b: any) {
           return reversed * (a - b);
         });
       }
     } else if (isDateSort) {
       if (sortBy !== '' && sortBy !== null) {
         // tslint:disable-next-line:only-arrow-functions
-        list.sort(function(a: any, b: any) {
+        list.sort(function (a: any, b: any) {
           return reversed * (a[sortBy].valueOf() - b[sortBy].valueOf());
         });
       } else {
         // tslint:disable-next-line:only-arrow-functions
-        list.sort(function(a: any, b: any) {
+        list.sort(function (a: any, b: any) {
           return reversed * (a.valueOf() - b.valueOf());
         });
       }
     } else {
       if (sortBy !== '' && sortBy !== null) {
         // tslint:disable-next-line:only-arrow-functions
-        list.sort(function(a: any, b: any) {
+        list.sort(function (a: any, b: any) {
           const x = a[sortBy].toLowerCase();
           const y = b[sortBy].toLowerCase();
           return x < y ? reversed * -1 : x > y ? reversed : 0;
         });
       } else {
         // tslint:disable-next-line:only-arrow-functions
-        list.sort(function(a: any, b: any) {
+        list.sort(function (a: any, b: any) {
           const x = a.toLowerCase();
           const y = b.toLowerCase();
           return x < y ? reversed * -1 : x > y ? reversed : 0;

@@ -3,18 +3,27 @@
     [data]="data"
     [listItemActions]="listItemActions"
     [listViewActions]="listViewActions"
+    [sortBySelection]="sortBySelection"
     [showSearch]="true" 
+    searchBy="name"
     [showMenu]="true"
     [showPaginator]="true"
-    [showListItemBadge]="true"
-    [showListItemSubtext]="true"
-    [showListItemInfo]="true"
     (searchTriggered)="onSearch($event)"
     (sortTriggered)="onSort($event)"
     (paginationTriggered)="onPaged($event)"
     (listItemActionTriggered)="onItemAction($event)"
-    (listViewActionTriggered)="onListViewAction($event)"
-    >
+    (listViewActionTriggered)="onListViewAction($event)">
+
+    <ng-template let-item="item" let-searchString="searchString">
+        <div class="list-item-content">
+            <div>
+                <span class="item-mainText" [innerHtml]="item.name | highlightSearch: searchString"></span>
+                <span class="item-subtext">
+                    {{item.greeting}}
+                </span>
+            </div>
+            <div class="cc-badge"><span>{{item.messageCount}}</span></div>
+        </div>
+    </ng-template>
     </app-cc-listview>
 </div>
-<router-outlet></router-outlet>

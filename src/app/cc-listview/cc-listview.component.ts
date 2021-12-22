@@ -1,11 +1,11 @@
 import { trigger, transition, style, animate } from '@angular/animations';
-import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ContentChild, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
 import { Pager } from './cc-paginator/pager';
+import { PaginatorService } from './cc-paginator/service/paginator.service';
 import { ActionResult } from './model/actionResult';
-import { IListViewItem } from './model/IListViewItem';
 import { ListViewAction } from './model/listViewAction';
 import { ListViewMode } from './model/listViewMode';
-import { SortBy, SortByKey, Sorter } from './model/sortBy';
+import { PropType, SortBy, Sorter } from './model/sortBy';
 
 @Component({
   selector: 'app-cc-listview',
@@ -24,13 +24,11 @@ import { SortBy, SortByKey, Sorter } from './model/sortBy';
   ]
 })
 export class CcListviewComponent implements OnInit {
-  private _data: IListViewItem[] = [];
+  private _data: any[] = [];
   @Input() showSearch: boolean = true;
+  @Input() searchBy: string = '';
   @Input() showMenu: boolean = true;
   @Input() showPaginator: boolean = true;
-  @Input() showListItemBadge: boolean = true;
-  @Input() showListItemSubtext: boolean = true;
-  @Input() showListItemInfo: boolean = true;
   @Input() clientsideSearch: boolean = true;
   @Input() clientsideSorting: boolean = true;
   @Input() clientsidePaging: boolean = true;
@@ -38,10 +36,11 @@ export class CcListviewComponent implements OnInit {
   @Input() pageSizeOptions: number[] = [10, 25, 50, 100, 500];
   @Input() maxDisplayedTotalPages: number = 5;
   @Input() paginatorBordered: boolean = false;
+  @Input() sortBySelection: SortBy[] = [];
   @Input() listItemActions: ListViewAction[] = [];
   @Input() listViewActions: ListViewAction[] = [];
   @Input()
-  public set data(v: IListViewItem[]) {
+  public set data(v: any[]) {
     this._data = v;
 
     if (this.rawData.length === 0 && this._data.length > 0) {
@@ -50,12 +49,12 @@ export class CcListviewComponent implements OnInit {
     
     if (this.clientsidePaging === true) {
       this.items = this._data.slice(0, this.pageSize);
-      this.sortItems();
+      this.sortItems(this.items);
     } else {
       this.items = this._data;
     }
   }
-  public get data(): IListViewItem[] {
+  public get data(): any[] {
     return this._data;
   }
 
@@ -65,6 +64,7 @@ export class CcListviewComponent implements OnInit {
   @Output() listItemActionTriggered = new EventEmitter<ActionResult>();
   @Output() listViewActionTriggered = new EventEmitter<ActionResult>();
 
+  @ContentChild(TemplateRef) template!: TemplateRef<any>;
   @ViewChild('dropdown', { static: false }) dropdown!: ElementRef;
 
   @HostListener('document:click', ['$event'])
@@ -80,10 +80,10 @@ export class CcListviewComponent implements OnInit {
 
   componentId: string;
   rawData: any[] = [];
-  items: IListViewItem[] = [];
-  checkedItems: IListViewItem[] = [];
+  items: any[] = [];
+  checkedItems: any[] = [];
   searchString: string = '';
-  sortBy: SortBy = new SortBy(SortByKey.TextAsc, 'Text', 'Text (A-Z)');
+  sortBy: SortBy = new SortBy('', '');
   currentListViewMode: ListViewMode = ListViewMode.None;
   menuIsOpen: boolean = false;
   // data: any[] = [];
@@ -92,29 +92,17 @@ export class CcListviewComponent implements OnInit {
   // lw: ListView = new ListView();
   ListViewMode: any = ListViewMode;
 
-  sortBySelection: SortBy[] = [
-    new SortBy(SortByKey.IndexAsc, 'Index', 'Index (0-1)'),
-    new SortBy(SortByKey.IndexDesc, 'Index', 'Index (1-0)'),
-    new SortBy(SortByKey.TextAsc, 'Text', 'Text (A-Z)'),
-    new SortBy(SortByKey.TextDesc, 'Text', 'Text (Z-A)'),
-    new SortBy(SortByKey.SubTextAsc, 'SubText', 'Subtext (A-Z)'),
-    new SortBy(SortByKey.SubTextDesc, 'SubText', 'Subtext (Z-A)'),
-    new SortBy(SortByKey.InfoAsc, 'Info', 'Info (A-Z)'),
-    new SortBy(SortByKey.InfoDesc, 'Info', 'Info (Z-A)'),
-    new SortBy(SortByKey.BadgeAsc, 'Badge', 'Badge (0-1)'),
-    new SortBy(SortByKey.BadgeDesc, 'Badge', 'Badge (1-0)')
-  ];
-
-  constructor() {
+  constructor(private paginatorService: PaginatorService) {
     this.componentId = this.createComponentId();
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.sortBy = this.getDefaultSort();
+  }
 
   pagerOnChange(pager: Pager) {
     if (this.clientsidePaging === true) {
       this.items = this.data.slice(pager.StartIndex, (pager.EndIndex + 1));
-      this.sortItems();
     } else {
       this.paginationTriggered.emit(pager);
     }
@@ -123,7 +111,7 @@ export class CcListviewComponent implements OnInit {
   searchOnClick(): void {
     if (this.clientsideSearch === true) {
       this.data = this.rawData.filter(item => {
-        return item.Text.toLowerCase().includes(this.searchString);
+        return item[this.searchBy].toLowerCase().includes(this.searchString);
       });
       this.items = this.data;
     } else {
@@ -131,46 +119,25 @@ export class CcListviewComponent implements OnInit {
     }
   }
 
-  sortItems(): void {
-    if (this.clientsideSorting === true) {
-      switch (this.sortBy.Type) {
-        case SortByKey.IndexAsc:
-          Sorter.sort(this.items, false, 'Index', true);
-          break;
-        case SortByKey.IndexDesc:
-          Sorter.sort(this.items, true, 'Index', true);
-          break;
-        case SortByKey.TextAsc:
-          Sorter.sort(this.items, false, 'Text');
-          break;
-        case SortByKey.TextDesc:
-          Sorter.sort(this.items, true, 'Text');
-          break;
-        case SortByKey.SubTextAsc:
-          Sorter.sort(this.items, false, 'SubText');
-          break;
-        case SortByKey.SubTextDesc:
-          Sorter.sort(this.items, true, 'SubText');
-          break;
-        case SortByKey.InfoAsc:
-          Sorter.sort(this.items, false, 'Info');
-          break;
-        case SortByKey.InfoDesc:
-          Sorter.sort(this.items, true, 'Info');
-          break;
-        case SortByKey.BadgeAsc:
-          Sorter.sort(this.items, false, 'Badge', true);
-          break;
-        case SortByKey.BadgeDesc:
-          Sorter.sort(this.items, true, 'Badge', true);
-          break;
-  
-        default:
-          Sorter.sort(this.items, false, 'Text');
-          break;
-      }
+  sortItems(list: any[]): void {
+    if (this.sortBy.PropType === PropType.Number) {
+      Sorter.sort(list, this.sortBy.Reversed, this.sortBy.Prop, true);
+    } else if (this.sortBy.PropType === PropType.Boolean) {
+      Sorter.sort(list, this.sortBy.Reversed, this.sortBy.Prop, false, true);
+    } else if (this.sortBy.PropType === PropType.Date) {
+      Sorter.sort(list, this.sortBy.Reversed, this.sortBy.Prop, false, false, true);
     } else {
-      this.sortTriggered.emit(this.sortBy);
+      Sorter.sort(list, this.sortBy.Reversed, this.sortBy.Prop);
+    }
+  }
+
+  getDefaultSort(): SortBy {
+    const found = this.sortBySelection.find(item => item.IsDefault === true);
+
+    if (found !== undefined) {
+      return found;
+    } else {
+      return new SortBy('', '');
     }
   }
 
@@ -181,39 +148,39 @@ export class CcListviewComponent implements OnInit {
     this.currentListViewMode = ListViewMode.None;
   }
 
-  itemEditOnClick(item: IListViewItem): void {
-    if (item.IsActive === true) {
-      item.IsActive = false;
+  itemEditOnClick(item: any): void {
+    if (item.isSelected === true) {
+      item.isSelected = false;
     } else {
       // tslint:disable-next-line:prefer-for-of
       for (let i = 0; i < this.items.length; i++) {
-        this.items[i].IsActive = false;
+        this.items[i].isSelected = false;
       }
-      item.IsActive = true;
+      item.isSelected = true;
     }
   }
 
-  itemContextMenuActionOnClick(action: ListViewAction, item: IListViewItem): void {
-    item.IsActive = false;
+  itemContextMenuActionOnClick(action: ListViewAction, item: any): void {
+    item.isActive = false;
     this.listItemActionTriggered.emit(new ActionResult(action, item));
   }
 
   checkAll(evt: any): void {
     if (evt.target.checked === true) {
-      this.items.forEach((item: IListViewItem) => (item.IsSelected = true));
+      this.items.forEach((item: any) => (item.isActive = true));
     } else {
-      this.items.forEach((item: IListViewItem) => (item.IsSelected = false));
+      this.items.forEach((item: any) => (item.isActive = false));
     }
     this.refreshCheckedItems();
   }
 
   uncheckAll(): void {
-    this.items.forEach((item: IListViewItem) => (item.IsSelected = false));
+    this.items.forEach((item: any) => (item.isActive = false));
     this.refreshCheckedItems();
   }
 
   refreshCheckedItems(): void {
-    this.checkedItems = this.items.filter((x) => x.IsSelected === true);
+    this.checkedItems = this.items.filter((x) => x.isActive === true);
   }
 
   getGridTemplateRowClass(): string {
@@ -232,6 +199,25 @@ export class CcListviewComponent implements OnInit {
       return 'withoutFooter';
     } else {
       return '';
+    }
+  }
+
+  sortByChanged(): void {
+    this.currentListViewMode = ListViewMode.None;
+
+    if (this.clientsideSorting === true) {
+      this.sortItems(this.rawData);
+      this.paginatorService.reset();
+      this.data = this.rawData
+
+      if (this.clientsideSearch === true) {
+        this.data = this.rawData.filter(item => {
+          return item[this.searchBy].toLowerCase().includes(this.searchString);
+        });
+        this.items = this.data;
+      }
+    } else {
+      this.sortTriggered.emit(this.sortBy);
     }
   }
 

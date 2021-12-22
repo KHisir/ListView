@@ -1,6 +1,28 @@
 # CcListview
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/)
+[![Angular](https://img.shields.io/badge/%3C%2F%3E-Angular-red.svg)](https://angular.io/)
+[![SCSS](https://img.shields.io/badge/%3C%2F%3E-SCSS-%23ff69b4.svg)](https://sass-lang.com/)
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.0.3.
+
+# Like my work?
+
+If you like my work, you can also support me with caffeine. I certainly drank many coffees to build and keep adding features for this great component.
+
+<a href='https://ko-fi.com/componentcollection'
+     target='_blank'>
+    <img height='30'
+         style='border:0px;height:32px;'
+         src='https://uploads-ssl.webflow.com/5c14e387dab576fe667689cf/5cbed8a4cf61eceb26012821_SupportMe_red-p-500.png'
+         border='0'
+         alt='Buy Me a Coffee at ko-fi.com' />
+</a>
+
+# Documentation & Preview
+
+https://componentcollection.com/cc-components/ListView
 
 ## Development server
 

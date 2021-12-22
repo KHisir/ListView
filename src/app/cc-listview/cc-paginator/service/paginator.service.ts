@@ -1,11 +1,22 @@
 import { Injectable } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
 import { Pager } from '../pager';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PaginatorService {
+  private _reset = new Subject<any>();
+  
   constructor() {}
+
+  onReset(): Observable<any> {
+    return this._reset.asObservable();
+  }
+
+  reset(): void {
+    this._reset.next();
+  }
 
   // getPager(totalItems: number, currentPage: number = 1, pageSize: number = 10) {
   getPager(pager: Pager): Pager {

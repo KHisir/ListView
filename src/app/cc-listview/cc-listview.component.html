@@ -4,7 +4,7 @@
 
 <link href="https://fonts.googleapis.com/css?family=Quicksand:400,700" rel="stylesheet">
 
-<div class="cc-listview" [ngClass]="getGridTemplateRowClass()">
+<div class="cc-listview">
   <!-- header -->
   <div class="cc-listview-header" [class.flex-end]="showSearch === false && currentListViewMode !== ListViewMode.Edit">
     <div class="cc-checkbox" [hidden]="currentListViewMode !== ListViewMode.Edit">
@@ -65,43 +65,6 @@
         </button>
       </div>
     </div>
-    <!-- <div class="list-item" *ngFor="let item of items" [class.checked-background]="item.IsSelected === true">
-      <div>
-        <div class="img-container" *ngIf="item.Icon !== ''">
-        </div>
-        
-        <div class="cc-checkbox" [hidden]="currentListViewMode !== ListViewMode.Edit">
-          <input [(ngModel)]="item.IsSelected" (change)="refreshCheckedItems()" class="inp-cbx" [attr.id]="'id-' + componentId + item.Id" type="checkbox"
-            style="display: none;" /><label class="cbx" [attr.for]="'id-' + componentId + item.Id"><span><svg width="12px"
-                height="9px" viewbox="0 0 12 9">
-                <polyline points="1 5 4 8 11 1"></polyline>
-              </svg></span><span></span></label>
-        </div>
-        <div class="text-container">
-          <span class="item-text" [innerHtml]="item.Text | highlightSearch: searchString">
-          </span>
-          <span class="item-subtext" *ngIf="showListItemSubtext">
-            {{item.SubText}}
-          </span>
-        </div>
-
-        <div class="right-container">
-          <span class="item-header-info" *ngIf="showListItemInfo">{{item.Info}}</span>
-          <div>
-            <div class="cc-badge" *ngIf="showListItemBadge"><span>{{item.Badge}}</span></div>
-            <button (click)="itemEditOnClick(item)" *ngIf="listItemActions.length > 0">
-              <i class="fas fa-pencil-alt"></i>
-            </button>
-          </div>
-        </div>
-
-      </div>
-      <div class="list-item-contextmenu slideup" [class.slidedown]="item.IsActive === true">
-        <button (click)="itemContextMenuActionOnClick(action, item)" *ngFor="let action of listItemActions">
-          {{action.Name}}
-        </button>
-      </div>
-    </div> -->
   </div>
 
   <!-- footer -->

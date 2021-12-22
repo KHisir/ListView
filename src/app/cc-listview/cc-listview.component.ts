@@ -183,24 +183,24 @@ export class CcListviewComponent implements OnInit {
     this.checkedItems = this.items.filter((x) => x.isActive === true);
   }
 
-  getGridTemplateRowClass(): string {
-    if (
-      this.showSearch === false &&
-      this.showMenu === false &&
-      this.showPaginator === false
-    ) {
-      return 'withoutHeaderAndFooter';
-    } else if (
-      this.showSearch === false &&
-      this.showMenu === false
-    ) {
-      return 'withoutHeader';
-    } else if (this.showPaginator === false) {
-      return 'withoutFooter';
-    } else {
-      return '';
-    }
-  }
+  // getGridTemplateRowClass(): string {
+  //   if (
+  //     this.showSearch === false &&
+  //     this.showMenu === false &&
+  //     this.showPaginator === false
+  //   ) {
+  //     return 'withoutHeaderAndFooter';
+  //   } else if (
+  //     this.showSearch === false &&
+  //     this.showMenu === false
+  //   ) {
+  //     return 'withoutHeader';
+  //   } else if (this.showPaginator === false) {
+  //     return 'withoutFooter';
+  //   } else {
+  //     return '';
+  //   }
+  // }
 
   sortByChanged(): void {
     this.currentListViewMode = ListViewMode.None;

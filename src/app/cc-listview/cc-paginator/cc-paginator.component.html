@@ -28,7 +28,9 @@
   </ul>
 
   <div class="page-size-container">
-    <span>{{pager.Info}}</span>
+    <div>
+      <span>{{pager.Info}}</span>
+    </div>
 
     <select (change)="pageSizeOnChange($event)" [disabled]="length === 0">
       <option *ngFor="let pageSize of pager.PageSizeList" [selected]="pageSize === pager.PageSize">{{pageSize}}</option>

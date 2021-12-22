@@ -68,6 +68,7 @@ export class CcPaginatorComponent implements OnInit, OnDestroy {
   }
 
   togglePages(): void {
+    this.calculateTotalElemWidth();
     if (this.paginatorWrapper !== undefined) {
       if (this.totalElemWidth > this.paginatorWrapper.nativeElement.offsetWidth) {
         this.disablePageBtns = true;

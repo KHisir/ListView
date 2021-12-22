@@ -52,9 +52,12 @@ $border-color: lightgray;
   }
 
   .page-size-container {
-    > span {
+    display: flex;
+    align-items: center;
+    span {
       font-size: 14px;
       margin-right: 5px;
+      white-space: nowrap;
     }
   }
 

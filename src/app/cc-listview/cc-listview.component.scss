@@ -19,32 +19,32 @@ $border-color: #c8ccd4;
   height: calc(100% - 10px);
   padding: 10px 10px 0 10px;
 
-  display: -ms-grid;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
 
-  display: grid;
-  -ms-grid-columns: 1fr;
-  grid-template-columns: 1fr;
-  -ms-grid-rows: auto 1fr auto;
-  grid-template-rows: auto 1fr auto;
+  // &.withoutHeader {
+  //   -ms-grid-rows: 1fr auto;
+  //   grid-template-rows: 1fr auto;
+  //   height: 100%;
+  //   padding: 0 10px;
+  // }
 
-  &.withoutHeader {
-    -ms-grid-rows: 1fr auto;
-    grid-template-rows: 1fr auto;
-    height: 100%;
-    padding: 0 10px;
-  }
+  // &.withoutFooter {
+  //   -ms-grid-rows: auto 1fr;
+  //   grid-template-rows: auto 1fr;
+  // }
 
-  &.withoutFooter {
-    -ms-grid-rows: auto 1fr;
-    grid-template-rows: auto 1fr;
-  }
-
-  &.withoutHeaderAndFooter {
-    -ms-grid-rows: 1fr;
-    grid-template-rows: 1fr;
-    height: 100%;
-    padding: 0 10px;
-  }
+  // &.withoutHeaderAndFooter {
+  //   -ms-grid-rows: 1fr;
+  //   grid-template-rows: 1fr;
+  //   height: 100%;
+  //   padding: 0 10px;
+  // }
 
   .disabled {
     opacity: 0.4;
